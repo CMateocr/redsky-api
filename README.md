@@ -32,7 +32,8 @@ This project is strictly structured using **Clean Architecture**, **Hexagonal Ar
 ## Getting Started
 
 ### Prerequisites
-- Node.js (v18+)
+- Node.js (v20+)
+- pnpm
 - Apify Account & API Token
 - Bluesky Account
 
@@ -48,21 +49,21 @@ CORS_ALLOWED_ORIGIN=*
 # Bluesky Integration
 BLUESKY_USERNAME=your_handle.bsky.social
 BLUESKY_PASSWORD=your_app_password
-BLUESKY_SOCIAL_URL=[https://bsky.social](https://bsky.social)
+BLUESKY_SOCIAL_URL=https://bsky.social
 
 # Facebook (Apify) Integration
 APIFY_API_TOKEN=your_apify_token
 APIFY_FACEBOOK_ACTOR=your_actor_id
 ```
 ### 2. Run
-```run
+```bash
 # Install dependencies
-$ npm install
+$ pnpm install
 
 # Run in development watch mode
-$ npm run start:dev
+$ pnpm run start:dev
 
 # Build and run for production
-$ npm run build
-$ npm run start:prod
+$ pnpm run build
+$ pnpm run start:prod
 ```
