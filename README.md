@@ -1,98 +1,68 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Redsky API (Social Aggregator)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![Apify](https://img.shields.io/badge/Apify-97CA3F?style=for-the-badge&logo=apify&logoColor=white)
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+A robust, NestJS-based REST API designed to fetch, normalize, and aggregate social media posts from different platforms (Bluesky and Facebook) into a unified, consistent data model. 
 
-## Description
+## Main Features
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **Unified Data Model:** Transforms platform-specific responses into a standardized `SocialPost` model (Text, Media, Author metadata, Engagement metrics, and nested replies).
+- **Bluesky Integration:** Direct integration with the AT Protocol SDK. Resolves user handles to DIDs and recursively fetches post threads.
+- **Facebook Integration:** Utilizes Apify (Web Scraping service) to extract post content, media, and metrics from Facebook dynamically.
+- **Environment-Aware Configuration:** Strict environment variable validation using `Joi` and `class-validator`.
 
-## Project setup
+## Architecture
 
-```bash
-$ pnpm install
+This project is strictly structured using **Clean Architecture**, **Hexagonal Architecture** and **Domain-Driven Design (DDD)** principles to ensure high maintainability, testability, and framework independence.
+
+* **Interface Layer:** Controllers (`social.controller.ts`) exposing RESTful HTTP endpoints.
+* **Application Layer:** Use Cases (`BlueskyUsecase`, `FacebookApifyUsecase`) orchestrating the data flow.
+* **Domain Layer:** Core business logic, Service Interfaces (`IBlueskyService`), and the normalized `SocialPost` model.
+* **Infrastructure Layer:** External service implementations (AT Protocol Agent, Apify Client) and Data Mappers bridging external APIs to domain models.
+
+## Endpoints
+
+| Method | Endpoint | Description | Query Params |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/social/bluesky` | Fetches a Bluesky post and its replies | `url` (required), `limit` (default: 5) |
+| `GET` | `/social/facebook` | Fetches a Facebook post via Apify | `url` (required) |
+
+## Getting Started
+
+### Prerequisites
+- Node.js (v18+)
+- Apify Account & API Token
+- Bluesky Account
+
+### 1. Environment Setup
+Create a `.env` file in the root directory (e.g., `./src/config/environments/dev.env`) with the following required variables:
+
+```env
+# Server
+PORT=3000
+APP_PREFIX=/api/v1
+CORS_ALLOWED_ORIGIN=*
+
+# Bluesky Integration
+BLUESKY_USERNAME=your_handle.bsky.social
+BLUESKY_PASSWORD=your_app_password
+BLUESKY_SOCIAL_URL=[https://bsky.social](https://bsky.social)
+
+# Facebook (Apify) Integration
+APIFY_API_TOKEN=your_apify_token
+APIFY_FACEBOOK_ACTOR=your_actor_id
 ```
+### 2. Run
+```run
+# Install dependencies
+$ npm install
 
-## Compile and run the project
+# Run in development watch mode
+$ npm run start:dev
 
-```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+# Build and run for production
+$ npm run build
+$ npm run start:prod
 ```
-
-## Run tests
-
-```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
